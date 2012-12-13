@@ -2,6 +2,7 @@ package client
 
 import (
 	zmq "github.com/alecthomas/gozmq"
+	"github.com/dustinrc/gonzo/mdp"
 )
 
 type connection struct {
@@ -31,7 +32,7 @@ func (conn *connection) close() {
 	conn.ctx.Close()
 }
 
-func (conn *connection) send(message Message) error {
+func (conn *connection) send(message mdp.Message) error {
 	err := conn.sock.SendMultipart(message, 0)
 	return err
 }

@@ -1,7 +1,9 @@
 package client
 
+import "github.com/dustinrc/gonzo/mdp"
+
 type Client interface {
-	Send(service string, message Message) error
+	Send(service string, message mdp.Message) error
 	Close()
 }
 
@@ -24,7 +26,7 @@ func (c *client) Close() {
 	c.conn.close()
 }
 
-func (c *client) Send(service string, message Message) error {
+func (c *client) Send(service string, message mdp.Message) error {
 	err := c.conn.send(message)
 	return err
 }
