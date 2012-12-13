@@ -2,11 +2,19 @@ package mdp
 
 import "testing"
 
+var (
+	in = []byte("foobar")
+	out = [][]byte{[]byte("foobar")}
+	frame1 = []byte("raboof")
+	frame2 = []byte("")
+	frame3 = []byte{0x0a, 0xa0}
+	newMsg = [][]byte{[]byte("foobar"), []byte("raboof"),
+		[]byte(""), []byte{0x0a, 0xa0}}
+	newRevMsg = [][]byte{[]byte{0x0a, 0xa0}, []byte(""),
+		[]byte("raboof"), []byte("foobar")}
+)
+
 func TestCreateMessage(t *testing.T) {
-	var (
-		in  = []byte("foobar")
-		out = [][]byte{[]byte("foobar")}
-	)
 	x := CreateMessage(in)
 	for i, v := range x {
 		if string(v) != string(out[i]) {
@@ -16,17 +24,10 @@ func TestCreateMessage(t *testing.T) {
 }
 
 func TestAppendFrame(t *testing.T) {
-	var (
-		origMsg     = CreateMessage([]byte("foobar"))
-		newFrame    = []byte("raboof")
-		newerFrame  = []byte("")
-		newestFrame = []byte{0x0a, 0xa0}
-		newMsg      = [][]byte{[]byte("foobar"), []byte("raboof"),
-			[]byte(""), []byte{0x0a, 0xa0}}
-	)
-	x := origMsg.AppendFrame(newFrame)
-	x = x.AppendFrame(newerFrame)
-	x = x.AppendFrame(newestFrame)
+	origMsg := CreateMessage(in)
+	x := origMsg.AppendFrame(frame1)
+	x = x.AppendFrame(frame2)
+	x = x.AppendFrame(frame3)
 	for i, v := range x {
 		if string(v) != string(newMsg[i]) {
 			t.Error("AppendFrame(%v) = %v, want %v", origMsg, x, newMsg)
@@ -35,19 +36,12 @@ func TestAppendFrame(t *testing.T) {
 }
 
 func TestPrependFrame(t *testing.T) {
-	var (
-		origMsg     = CreateMessage([]byte("foobar"))
-		newFrame    = []byte("raboof")
-		newerFrame  = []byte("")
-		newestFrame = []byte{0x0a, 0xa0}
-		newMsg      = [][]byte{[]byte{0x0a, 0xa0}, []byte(""),
-			[]byte("raboof"), []byte("foobar")}
-	)
-	x := origMsg.PrependFrame(newFrame)
-	x = x.PrependFrame(newerFrame)
-	x = x.PrependFrame(newestFrame)
+	origMsg := CreateMessage(in)
+	x := origMsg.PrependFrame(frame1)
+	x = x.PrependFrame(frame2)
+	x = x.PrependFrame(frame3)
 	for i, v := range x {
-		if string(v) != string(newMsg[i]) {
+		if string(v) != string(newRevMsg[i]) {
 			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newMsg)
 		}
 	}
