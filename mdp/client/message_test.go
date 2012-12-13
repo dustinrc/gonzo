@@ -15,7 +15,7 @@ func TestCreateMessage(t *testing.T) {
 	}
 }
 
-func TestAddFrame(t *testing.T) {
+func TestAppendFrame(t *testing.T) {
 	var (
 		origMsg     = CreateMessage([]byte("foobar"))
 		newFrame    = []byte("raboof")
@@ -24,12 +24,12 @@ func TestAddFrame(t *testing.T) {
 		newMsg      = [][]byte{[]byte("foobar"), []byte("raboof"),
 			[]byte(""), []byte{0x0a, 0xa0}}
 	)
-	x := origMsg.AddFrame(newFrame)
-	x = x.AddFrame(newerFrame)
-	x = x.AddFrame(newestFrame)
+	x := origMsg.AppendFrame(newFrame)
+	x = x.AppendFrame(newerFrame)
+	x = x.AppendFrame(newestFrame)
 	for i, v := range x {
 		if string(v) != string(newMsg[i]) {
-			t.Error("AddFrame(%v) = %v, want %v", origMsg, x, newMsg)
+			t.Error("AppendFrame(%v) = %v, want %v", origMsg, x, newMsg)
 		}
 	}
 }

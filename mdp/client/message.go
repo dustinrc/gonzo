@@ -6,7 +6,7 @@ func CreateMessage(frame []byte) Message {
 	return [][]byte{frame}
 }
 
-func (m Message) AddFrame(frame []byte) Message {
+func (m Message) AppendFrame(frame []byte) Message {
 	m = append(m, frame)
 	return m
 }
