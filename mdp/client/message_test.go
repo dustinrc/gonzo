@@ -33,3 +33,22 @@ func TestAddFrame(t *testing.T) {
 		}
 	}
 }
+
+func TestPrependFrame(t *testing.T) {
+	var (
+		origMsg     = CreateMessage([]byte("foobar"))
+		newFrame    = []byte("raboof")
+		newerFrame  = []byte("")
+		newestFrame = []byte{0x0a, 0xa0}
+		newMsg      = [][]byte{[]byte{0x0a, 0xa0}, []byte(""),
+			[]byte("raboof"), []byte("foobar")}
+	)
+	x := origMsg.PrependFrame(newFrame)
+	x = x.PrependFrame(newerFrame)
+	x = x.PrependFrame(newestFrame)
+	for i, v := range x {
+		if string(v) != string(newMsg[i]) {
+			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newMsg)
+		}
+	}
+}
