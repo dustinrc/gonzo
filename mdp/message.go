@@ -11,7 +11,7 @@ func (m Message) AppendFrame(frame []byte) Message {
 	return m
 }
 
-func (m Message) AppendFrames(frames... []byte) Message {
+func (m Message) AppendFrames(frames ...[]byte) Message {
 	m = append(m, frames...)
 	return m
 }
@@ -21,7 +21,7 @@ func (m Message) PrependFrame(frame []byte) Message {
 	return m
 }
 
-func (m Message) PrependFrames(frames... []byte) Message {
+func (m Message) PrependFrames(frames ...[]byte) Message {
 	m = append(frames, m...)
 	return m
 }

@@ -3,8 +3,8 @@ package mdp
 import "testing"
 
 var (
-	in = []byte("foobar")
-	out = [][]byte{[]byte("foobar")}
+	in     = []byte("foobar")
+	out    = [][]byte{[]byte("foobar")}
 	frame1 = []byte("raboof")
 	frame2 = []byte("")
 	frame3 = []byte{0x0a, 0xa0}
