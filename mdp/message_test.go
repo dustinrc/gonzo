@@ -35,6 +35,17 @@ func TestAppendFrame(t *testing.T) {
 	}
 }
 
+func TestAppendFrames(t *testing.T) {
+	origMsg := CreateMessage(in)
+	x := origMsg.AppendFrames(frame1, frame2, frame3)
+	for i, v := range x {
+		if string(v) != string(newMsg[i]) {
+			t.Error("AppendFrames(%v) = %v, want %v", origMsg, x, newMsg)
+			break
+		}
+	}
+}
+
 func TestPrependFrame(t *testing.T) {
 	origMsg := CreateMessage(in)
 	x := origMsg.PrependFrame(frame1)
@@ -43,6 +54,17 @@ func TestPrependFrame(t *testing.T) {
 	for i, v := range x {
 		if string(v) != string(newRevMsg[i]) {
 			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newRevMsg)
+		}
+	}
+}
+
+func TestPrependFrames(t *testing.T) {
+	origMsg := CreateMessage(in)
+	x := origMsg.PrependFrames(frame3, frame2, frame1)
+	for i, v := range x {
+		if string(v) != string(newRevMsg[i]) {
+			t.Error("PrependFrames(%v) = %v, want %v", origMsg, x, newRevMsg)
+			break
 		}
 	}
 }
