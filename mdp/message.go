@@ -22,7 +22,6 @@ func (m Message) PrependFrame(frame []byte) Message {
 }
 
 func (m Message) PrependFrames(frames... []byte) Message {
-	tempFrames := append([][]byte{frames[0]}, frames[1:]...)
-	m = append(tempFrames, m...)
+	m = append(frames, m...)
 	return m
 }
