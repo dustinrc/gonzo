@@ -42,7 +42,7 @@ func TestPrependFrame(t *testing.T) {
 	x = x.PrependFrame(frame3)
 	for i, v := range x {
 		if string(v) != string(newRevMsg[i]) {
-			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newMsg)
+			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newRevMsg)
 		}
 	}
 }
