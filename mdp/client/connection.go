@@ -36,3 +36,8 @@ func (conn *connection) send(message mdp.Message) error {
 	err := conn.sock.SendMultipart(message, 0)
 	return err
 }
+
+func (conn *connection) recv() (mdp.Message, error) {
+	reply, err := conn.sock.RecvMultipart(0)
+	return reply, err
+}

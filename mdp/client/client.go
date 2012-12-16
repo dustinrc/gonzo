@@ -3,7 +3,7 @@ package client
 import "github.com/dustinrc/gonzo/mdp"
 
 type Client interface {
-	Send(service string, message mdp.Message) error
+	Send(service string, message mdp.Message) (mdp.Message, error)
 	Close()
 }
 
@@ -26,8 +26,18 @@ func (c *client) Close() {
 	c.conn.close()
 }
 
-func (c *client) Send(service string, message mdp.Message) error {
-	message = message.PrependFrames([]byte(mdp.CV01), []byte(service))
-	err := c.conn.send(message)
-	return err
+func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) {
+	request := message.PrependFrames([]byte(mdp.CV01), []byte(service))
+	err := c.conn.send(request)
+	if err != nil {
+		return nil, err
+	}
+
+	reply, err := c.conn.recv()
+	if err != nil {
+		return nil, err
+	}
+
+	reply = reply[2:]
+	return reply, nil
 }
