@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	broker = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
-	data = flag.String("d", "ping", "data to send to the service")
+	broker  = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
+	data    = flag.String("d", "ping", "data to send to the service")
 	service = flag.String("s", "echo", "service requested")
 )
 
