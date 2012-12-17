@@ -9,7 +9,6 @@ import (
 
 var (
 	broker  = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
-	data    = flag.String("d", "ping", "data to send to the service")
 	service = flag.String("s", "echo", "service requested")
 )
 
@@ -22,7 +21,11 @@ func main() {
 	}
 	defer c.Close()
 
-	m := mdp.CreateMessage([]byte(*data))
+	var argsAsBytes [][]byte
+	for _, v := range flag.Args() {
+		argsAsBytes = append(argsAsBytes, []byte(v))
+	}
+	m := mdp.CreateMessage(argsAsBytes...)
 
 	reply, err := c.Send(*service, m)
 	if err != nil {
