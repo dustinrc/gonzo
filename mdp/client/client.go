@@ -27,7 +27,7 @@ func (c *client) Close() {
 }
 
 func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) {
-	request := message.PrependFrames([]byte(mdp.CV01), []byte(service))
+	request := message.Prepend([]byte(mdp.CV01), []byte(service))
 	err := c.conn.send(request)
 	if err != nil {
 		return nil, err
