@@ -23,47 +23,32 @@ func TestCreateMessage(t *testing.T) {
 	}
 }
 
-func TestAppendFrame(t *testing.T) {
-	origMsg := CreateMessage(in)
-	x := origMsg.AppendFrame(frame1)
-	x = x.AppendFrame(frame2)
-	x = x.AppendFrame(frame3)
+func TestCreateMessageFromMultiple(t *testing.T) {
+	x := CreateMessage(in, frame1, frame2, frame3)
 	for i, v := range x {
 		if string(v) != string(newMsg[i]) {
-			t.Error("AppendFrame(%v) = %v, want %v", origMsg, x, newMsg)
+			t.Errorf("CreateMessage(%v) = %v, want %v", in, x, newMsg)
 		}
 	}
 }
 
-func TestAppendFrames(t *testing.T) {
+func TestAppend(t *testing.T) {
 	origMsg := CreateMessage(in)
-	x := origMsg.AppendFrames(frame1, frame2, frame3)
+	x := origMsg.Append(frame1, frame2, frame3)
 	for i, v := range x {
 		if string(v) != string(newMsg[i]) {
-			t.Error("AppendFrames(%v) = %v, want %v", origMsg, x, newMsg)
+			t.Error("Append(%v) = %v, want %v", origMsg, x, newMsg)
 			break
 		}
 	}
 }
 
-func TestPrependFrame(t *testing.T) {
+func TestPrepend(t *testing.T) {
 	origMsg := CreateMessage(in)
-	x := origMsg.PrependFrame(frame1)
-	x = x.PrependFrame(frame2)
-	x = x.PrependFrame(frame3)
+	x := origMsg.Prepend(frame3, frame2, frame1)
 	for i, v := range x {
 		if string(v) != string(newRevMsg[i]) {
-			t.Error("PrependFrame(%v) = %v, want %v", origMsg, x, newRevMsg)
-		}
-	}
-}
-
-func TestPrependFrames(t *testing.T) {
-	origMsg := CreateMessage(in)
-	x := origMsg.PrependFrames(frame3, frame2, frame1)
-	for i, v := range x {
-		if string(v) != string(newRevMsg[i]) {
-			t.Error("PrependFrames(%v) = %v, want %v", origMsg, x, newRevMsg)
+			t.Error("Prepend(%v) = %v, want %v", origMsg, x, newRevMsg)
 			break
 		}
 	}

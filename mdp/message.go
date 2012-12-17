@@ -2,26 +2,14 @@ package mdp
 
 type Message [][]byte
 
-func CreateMessage(frame []byte) Message {
-	return [][]byte{frame}
+func CreateMessage(frames ...[]byte) Message {
+	return append([][]byte{}, frames...)
 }
 
-func (m Message) AppendFrame(frame []byte) Message {
-	m = append(m, frame)
-	return m
+func (m Message) Append(frames ...[]byte) Message {
+	return append(m, frames...)
 }
 
-func (m Message) AppendFrames(frames ...[]byte) Message {
-	m = append(m, frames...)
-	return m
-}
-
-func (m Message) PrependFrame(frame []byte) Message {
-	m = append([][]byte{frame}, m...)
-	return m
-}
-
-func (m Message) PrependFrames(frames ...[]byte) Message {
-	m = append(frames, m...)
-	return m
+func (m Message) Prepend(frames ...[]byte) Message {
+	return append(frames, m...)
 }
