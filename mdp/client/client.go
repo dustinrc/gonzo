@@ -15,7 +15,7 @@ type client struct {
 }
 
 type clientMismatchError struct {
-	mismatchType string
+	mismatchType   string
 	want, received interface{}
 }
 
