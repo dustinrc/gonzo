@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 	"github.com/dustinrc/gonzo/mdp"
 	"github.com/dustinrc/gonzo/mdp/client"
+	"os"
 )
 
 var (

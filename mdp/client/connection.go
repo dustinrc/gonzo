@@ -43,7 +43,7 @@ func (conn *connection) close() {
 func (conn *connection) send(message mdp.Message) (err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLOUT}
 	pis := zmq.PollItems{pi}
-	_, err = zmq.Poll(pis, int64(conn.tmo * 1e6))
+	_, err = zmq.Poll(pis, int64(conn.tmo*1e6))
 	if err != nil {
 	} else if i := pis[0]; i.REvents&zmq.POLLOUT != 0 {
 		err = conn.sock.SendMultipart(message, 0)
@@ -56,7 +56,7 @@ func (conn *connection) send(message mdp.Message) (err error) {
 func (conn *connection) recv() (message mdp.Message, err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLIN}
 	pis := zmq.PollItems{pi}
-	_, err = zmq.Poll(pis, int64(conn.tmo * 1e6))
+	_, err = zmq.Poll(pis, int64(conn.tmo*1e6))
 	if err != nil {
 	} else if i := pis[0]; i.REvents&zmq.POLLIN != 0 {
 		message, err = conn.sock.RecvMultipart(0)
