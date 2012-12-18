@@ -44,12 +44,10 @@ func (conn *connection) send(message mdp.Message) (err error) {
 	pis := zmq.PollItems{pi}
 	_, err = zmq.Poll(pis, 5e6)
 	if err != nil {
-		return
 	} else if i := pis[0]; i.REvents&zmq.POLLOUT != 0 {
 		err = conn.sock.SendMultipart(message, 0)
 	} else {
 		err = timeoutError{"connection.send() timeout"}
-		return
 	}
 	return
 }
