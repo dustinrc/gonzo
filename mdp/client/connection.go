@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	zmq "github.com/alecthomas/gozmq"
 	"github.com/dustinrc/gonzo/mdp"
 )
@@ -9,6 +10,12 @@ type connection struct {
 	ctx  zmq.Context
 	sock zmq.Socket
 }
+
+type timeoutError struct {
+	msg string
+}
+
+func (e timeoutError) Error() string { return fmt.Sprintf("%v", e.msg) }
 
 func newConnection(url string) (*connection, error) {
 	ctx, err := zmq.NewContext()
@@ -32,12 +39,30 @@ func (conn *connection) close() {
 	conn.ctx.Close()
 }
 
-func (conn *connection) send(message mdp.Message) error {
-	err := conn.sock.SendMultipart(message, 0)
-	return err
+func (conn *connection) send(message mdp.Message) (err error) {
+	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLOUT}
+	pis := zmq.PollItems{pi}
+	_, err = zmq.Poll(pis, 5e6)
+	if err != nil {
+		return
+	} else if i := pis[0]; i.REvents&zmq.POLLOUT != 0 {
+		err = conn.sock.SendMultipart(message, 0)
+	} else {
+		err = timeoutError{"connection.send() timeout"}
+		return
+	}
+	return
 }
 
-func (conn *connection) recv() (mdp.Message, error) {
-	reply, err := conn.sock.RecvMultipart(0)
-	return reply, err
+func (conn *connection) recv() (message mdp.Message, err error) {
+	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLIN}
+	pis := zmq.PollItems{pi}
+	_, err = zmq.Poll(pis, 5e6)
+	if err != nil {
+	} else if i := pis[0]; i.REvents&zmq.POLLIN != 0 {
+		message, err = conn.sock.RecvMultipart(0)
+	} else {
+		err = timeoutError{"connection.recv() timeout"}
+	}
+	return
 }
