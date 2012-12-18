@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"github.com/dustinrc/gonzo/mdp"
 	"github.com/dustinrc/gonzo/mdp/client"
 )
@@ -29,9 +30,11 @@ func main() {
 
 	reply, err := c.Send(*service, m)
 	if err != nil {
-		panic(err)
-	}
-	for i, v := range reply {
-		fmt.Printf("frame[%d]: %s\n", i, v)
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	} else {
+		for i, v := range reply {
+			fmt.Printf("frame[%02d]: %s\n", i, v)
+		}
 	}
 }
