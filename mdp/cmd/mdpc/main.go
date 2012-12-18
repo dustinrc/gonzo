@@ -11,12 +11,13 @@ import (
 var (
 	broker  = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
 	service = flag.String("s", "echo", "service requested")
+	timeout = flag.Float64("t", 5.0, "request/reply timeout (seconds)")
 )
 
 func main() {
 	flag.Parse()
 
-	c, err := client.New(*broker)
+	c, err := client.New(*broker, *timeout)
 	if err != nil {
 		panic(err)
 	}

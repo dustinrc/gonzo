@@ -11,8 +11,8 @@ type client struct {
 	conn *connection
 }
 
-func New(brokerURL string) (Client, error) {
-	conn, err := newConnection(brokerURL)
+func New(brokerURL string, timeout float64) (Client, error) {
+	conn, err := newConnection(brokerURL, timeout)
 	if err != nil {
 		return nil, err
 	}
