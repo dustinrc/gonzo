@@ -36,7 +36,9 @@ func newConnection(url string) (*connection, error) {
 
 func (conn *connection) close() {
 	conn.sock.Close()
+	conn.sock = nil
 	conn.ctx.Close()
+	conn.ctx = nil
 }
 
 func (conn *connection) send(message mdp.Message, timeout float64) (err error) {

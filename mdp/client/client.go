@@ -49,23 +49,35 @@ func (c *client) Dial() error {
 
 func (c *client) Close() {
 	c.conn.close()
+	c.conn = nil
 }
 
 func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) {
+	var (
+		reply mdp.Message
+		err   error
+	)
 	request := message.Prepend([]byte(mdp.CV01), []byte(service))
-	err := c.conn.send(request, c.timeout)
-	if err != nil {
-		return nil, err
-	}
 
-	var reply mdp.Message
 	for attempt := 1; attempt <= c.attempts; attempt++ {
-		reply, err = c.conn.recv(c.timeout)
+		// TODO: find cleaner way to do this...
+		if err == nil {
+			err = c.conn.send(request, c.timeout)
+		}
+		if err == nil {
+			reply, err = c.conn.recv(c.timeout)
+		}
 		if err == nil {
 			break
 		}
 		if err != nil {
-			fmt.Println("Failed attempt", attempt, "of", c.attempts)
+			fmt.Println("Failed attempt", attempt, "of", c.attempts,
+				":", err)
+			c.Close()
+			err = c.Dial()
+			if err != nil {
+				continue
+			}
 		}
 		if attempt == c.attempts {
 			return nil, err
