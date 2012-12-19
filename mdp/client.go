@@ -1,9 +1,8 @@
-package client
+package mdp
 
 import (
 	"fmt"
 	"github.com/dustinrc/gonzo"
-	"github.com/dustinrc/gonzo/mdp"
 )
 
 type Client interface {
@@ -29,7 +28,7 @@ func (e clientMismatchError) Error() string {
 		e.want, e.received)
 }
 
-func New(brokerURL string, timeout float64, attempts int) (Client, error) {
+func NewClient(brokerURL string, timeout float64, attempts int) (Client, error) {
 	newClient := client{url: brokerURL, timeout: timeout, attempts: attempts}
 	return &newClient, nil
 }
@@ -58,7 +57,7 @@ func (c *client) Send(service string, message gonzo.Message) (gonzo.Message, err
 		reply gonzo.Message
 		err   error
 	)
-	request := message.Prepend([]byte(mdp.CV01), []byte(service))
+	request := message.Prepend([]byte(CV01), []byte(service))
 
 	for attempt := 1; attempt <= c.attempts; attempt++ {
 		// TODO: find cleaner way to do this...
@@ -85,8 +84,8 @@ func (c *client) Send(service string, message gonzo.Message) (gonzo.Message, err
 		}
 	}
 
-	if proto := string(reply[0]); proto != mdp.CV01 {
-		err = clientMismatchError{"protocol", mdp.CV01, proto}
+	if proto := string(reply[0]); proto != CV01 {
+		err = clientMismatchError{"protocol", CV01, proto}
 		return nil, err
 	} else if srvc := string(reply[1]); srvc != service {
 		err = clientMismatchError{"service", service, srvc}

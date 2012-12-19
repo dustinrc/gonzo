@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dustinrc/gonzo"
-	"github.com/dustinrc/gonzo/mdp/client"
+	"github.com/dustinrc/gonzo/mdp"
 	"os"
 )
 
@@ -18,7 +18,7 @@ var (
 func main() {
 	flag.Parse()
 
-	c, err := client.New(*broker, *timeout, *attempts)
+	c, err := mdp.NewClient(*broker, *timeout, *attempts)
 	if err != nil {
 		panic(err)
 	}
