@@ -1,4 +1,4 @@
-package mdp
+package gonzo
 
 import "testing"
 
