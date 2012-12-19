@@ -13,7 +13,7 @@ type Client interface {
 }
 
 type client struct {
-	conn     *connection
+	conn     *gonzo.Connection
 	url      string
 	timeout  float64
 	attempts int
@@ -39,7 +39,7 @@ func (c *client) Dial() error {
 		return nil
 	}
 
-	conn, err := newConnection(c.url)
+	conn, err := gonzo.NewConnection(c.url)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (c *client) Dial() error {
 }
 
 func (c *client) Close() {
-	c.conn.close()
+	c.conn.Close()
 	c.conn = nil
 }
 
@@ -63,10 +63,10 @@ func (c *client) Send(service string, message gonzo.Message) (gonzo.Message, err
 	for attempt := 1; attempt <= c.attempts; attempt++ {
 		// TODO: find cleaner way to do this...
 		if err == nil {
-			err = c.conn.send(request, c.timeout)
+			err = c.conn.Send(request, c.timeout)
 		}
 		if err == nil {
-			reply, err = c.conn.recv(c.timeout)
+			reply, err = c.conn.Recv(c.timeout)
 		}
 		if err == nil {
 			break

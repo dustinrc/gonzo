@@ -1,12 +1,11 @@
-package client
+package gonzo
 
 import (
 	"fmt"
 	zmq "github.com/alecthomas/gozmq"
-	"github.com/dustinrc/gonzo"
 )
 
-type connection struct {
+type Connection struct {
 	ctx  zmq.Context
 	sock zmq.Socket
 }
@@ -17,7 +16,7 @@ type timeoutError struct {
 
 func (e timeoutError) Error() string { return fmt.Sprintf("%v", e.msg) }
 
-func newConnection(url string) (*connection, error) {
+func NewConnection(url string) (*Connection, error) {
 	ctx, err := zmq.NewContext()
 	if err != nil {
 		return nil, err
@@ -29,19 +28,19 @@ func newConnection(url string) (*connection, error) {
 	}
 
 	sock.Connect(url)
-	conn := connection{ctx, sock}
+	conn := Connection{ctx, sock}
 
 	return &conn, nil
 }
 
-func (conn *connection) close() {
+func (conn *Connection) Close() {
 	conn.sock.Close()
 	conn.sock = nil
 	conn.ctx.Close()
 	conn.ctx = nil
 }
 
-func (conn *connection) send(message gonzo.Message, timeout float64) (err error) {
+func (conn *Connection) Send(message Message, timeout float64) (err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLOUT}
 	pis := zmq.PollItems{pi}
 	_, err = zmq.Poll(pis, int64(timeout*1e6))
@@ -49,12 +48,12 @@ func (conn *connection) send(message gonzo.Message, timeout float64) (err error)
 	} else if i := pis[0]; i.REvents&zmq.POLLOUT != 0 {
 		err = conn.sock.SendMultipart(message, 0)
 	} else {
-		err = timeoutError{"connection.send() timeout"}
+		err = timeoutError{"Connection.Send() timeout"}
 	}
 	return
 }
 
-func (conn *connection) recv(timeout float64) (message gonzo.Message, err error) {
+func (conn *Connection) Recv(timeout float64) (message Message, err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLIN}
 	pis := zmq.PollItems{pi}
 	_, err = zmq.Poll(pis, int64(timeout*1e6))
@@ -62,7 +61,7 @@ func (conn *connection) recv(timeout float64) (message gonzo.Message, err error)
 	} else if i := pis[0]; i.REvents&zmq.POLLIN != 0 {
 		message, err = conn.sock.RecvMultipart(0)
 	} else {
-		err = timeoutError{"connection.recv() timeout"}
+		err = timeoutError{"Connection.Recv() timeout"}
 	}
 	return
 }
