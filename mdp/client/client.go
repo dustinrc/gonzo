@@ -11,7 +11,8 @@ type Client interface {
 }
 
 type client struct {
-	conn *connection
+	conn     *connection
+	attempts int
 }
 
 type clientMismatchError struct {
@@ -24,13 +25,13 @@ func (e clientMismatchError) Error() string {
 		e.want, e.received)
 }
 
-func New(brokerURL string, timeout float64) (Client, error) {
+func New(brokerURL string, timeout float64, attempts int) (Client, error) {
 	conn, err := newConnection(brokerURL, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	newClient := client{conn}
+	newClient := client{conn, attempts}
 
 	return &newClient, nil
 }
@@ -46,9 +47,18 @@ func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) 
 		return nil, err
 	}
 
-	reply, err := c.conn.recv()
-	if err != nil {
-		return nil, err
+	var reply mdp.Message
+	for attempt := 1; attempt <= c.attempts; attempt++ {
+		reply, err = c.conn.recv()
+		if err == nil {
+			break
+		}
+		if err != nil {
+			fmt.Println("Failed attempt", attempt, "of", c.attempts)
+		}
+		if attempt == c.attempts {
+			return nil, err
+		}
 	}
 
 	if proto := string(reply[0]); proto != mdp.CV01 {
