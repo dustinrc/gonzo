@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	c.Dial()
 	defer c.Close()
 
 	var argsAsBytes [][]byte
