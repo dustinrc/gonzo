@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/dustinrc/gonzo/mdp"
+	"github.com/dustinrc/gonzo"
 	"github.com/dustinrc/gonzo/mdp/client"
 	"os"
 )
@@ -29,7 +29,7 @@ func main() {
 	for _, v := range flag.Args() {
 		argsAsBytes = append(argsAsBytes, []byte(v))
 	}
-	m := mdp.CreateMessage(argsAsBytes...)
+	m := gonzo.CreateMessage(argsAsBytes...)
 
 	reply, err := c.Send(*service, m)
 	if err != nil {

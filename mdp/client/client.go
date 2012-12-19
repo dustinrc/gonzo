@@ -2,12 +2,13 @@ package client
 
 import (
 	"fmt"
+	"github.com/dustinrc/gonzo"
 	"github.com/dustinrc/gonzo/mdp"
 )
 
 type Client interface {
 	Dial() error
-	Send(service string, message mdp.Message) (mdp.Message, error)
+	Send(service string, message gonzo.Message) (gonzo.Message, error)
 	Close()
 }
 
@@ -52,9 +53,9 @@ func (c *client) Close() {
 	c.conn = nil
 }
 
-func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) {
+func (c *client) Send(service string, message gonzo.Message) (gonzo.Message, error) {
 	var (
-		reply mdp.Message
+		reply gonzo.Message
 		err   error
 	)
 	request := message.Prepend([]byte(mdp.CV01), []byte(service))

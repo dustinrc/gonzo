@@ -3,7 +3,7 @@ package client
 import (
 	"fmt"
 	zmq "github.com/alecthomas/gozmq"
-	"github.com/dustinrc/gonzo/mdp"
+	"github.com/dustinrc/gonzo"
 )
 
 type connection struct {
@@ -41,7 +41,7 @@ func (conn *connection) close() {
 	conn.ctx = nil
 }
 
-func (conn *connection) send(message mdp.Message, timeout float64) (err error) {
+func (conn *connection) send(message gonzo.Message, timeout float64) (err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLOUT}
 	pis := zmq.PollItems{pi}
 	_, err = zmq.Poll(pis, int64(timeout*1e6))
@@ -54,7 +54,7 @@ func (conn *connection) send(message mdp.Message, timeout float64) (err error) {
 	return
 }
 
-func (conn *connection) recv(timeout float64) (message mdp.Message, err error) {
+func (conn *connection) recv(timeout float64) (message gonzo.Message, err error) {
 	pi := zmq.PollItem{Socket: conn.sock, Events: zmq.POLLIN}
 	pis := zmq.PollItems{pi}
 	_, err = zmq.Poll(pis, int64(timeout*1e6))
