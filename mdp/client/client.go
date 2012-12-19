@@ -12,6 +12,7 @@ type Client interface {
 
 type client struct {
 	conn     *connection
+	timeout  float64
 	attempts int
 }
 
@@ -26,12 +27,12 @@ func (e clientMismatchError) Error() string {
 }
 
 func New(brokerURL string, timeout float64, attempts int) (Client, error) {
-	conn, err := newConnection(brokerURL, timeout)
+	conn, err := newConnection(brokerURL)
 	if err != nil {
 		return nil, err
 	}
 
-	newClient := client{conn, attempts}
+	newClient := client{conn, timeout, attempts}
 
 	return &newClient, nil
 }
@@ -42,14 +43,14 @@ func (c *client) Close() {
 
 func (c *client) Send(service string, message mdp.Message) (mdp.Message, error) {
 	request := message.Prepend([]byte(mdp.CV01), []byte(service))
-	err := c.conn.send(request)
+	err := c.conn.send(request, c.timeout)
 	if err != nil {
 		return nil, err
 	}
 
 	var reply mdp.Message
 	for attempt := 1; attempt <= c.attempts; attempt++ {
-		reply, err = c.conn.recv()
+		reply, err = c.conn.recv(c.timeout)
 		if err == nil {
 			break
 		}
