@@ -16,13 +16,13 @@ type timeoutError struct {
 
 func (e timeoutError) Error() string { return fmt.Sprintf("%v", e.msg) }
 
-func NewConnection(url string) (*Connection, error) {
+func NewConnection(url string, sockType zmq.SocketType) (*Connection, error) {
 	ctx, err := zmq.NewContext()
 	if err != nil {
 		return nil, err
 	}
 
-	sock, err := ctx.NewSocket(zmq.REQ)
+	sock, err := ctx.NewSocket(sockType)
 	if err != nil {
 		return nil, err
 	}

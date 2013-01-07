@@ -2,6 +2,7 @@ package mdp
 
 import (
 	"fmt"
+	zmq "github.com/alecthomas/gozmq"
 	"github.com/dustinrc/gonzo"
 )
 
@@ -38,7 +39,7 @@ func (c *client) Dial() error {
 		return nil
 	}
 
-	conn, err := gonzo.NewConnection(c.url)
+	conn, err := gonzo.NewConnection(c.url, zmq.REQ)
 	if err != nil {
 		return err
 	}
