@@ -70,6 +70,7 @@ func (w *worker) Listen(rh RequestHandler) {
 		m, _ := w.conn.Recv(-1)
 		switch m[2][0] {
 		default:
+			fmt.Println("disconnect and reconnect...")
 			w.Disconnect()
 			if err := w.Dial(); err != nil { panic(err) }
 			w.Ready()
