@@ -4,6 +4,7 @@ import (
 	"fmt"
 	zmq "github.com/alecthomas/gozmq"
 	"github.com/dustinrc/gonzo"
+	"time"
 )
 
 type RequestHandler func(gonzo.Message) gonzo.Message
@@ -65,22 +66,37 @@ func (w *worker) Reply(replyBody gonzo.Message, addr []byte) {
 	w.conn.Send(m, 0.0)
 }
 
-func (w *worker) Listen(rh RequestHandler) {
+func (w *worker) listen(requests chan gonzo.Message) {
 	for {
 		m, _ := w.conn.Recv(-1)
-		switch m[2][0] {
-		default:
-			fmt.Println("disconnect and reconnect...")
-			w.Disconnect()
-			if err := w.Dial(); err != nil { panic(err) }
-			w.Ready()
-		case HEARTBEAT:
-			fmt.Println("HEARTBEAT")
+		requests <- m
+	}
+}
+
+func (w *worker) Listen(rh RequestHandler) {
+	rq := make(chan gonzo.Message, 1)
+	missed := 0
+	go w.listen(rq)
+	for {
+		select {
+		case m := <-rq:
+			switch m[2][0] {
+			default:
+				w.Reconnect()
+			case HEARTBEAT:
+				fmt.Println("HEARTBEAT Received")
+				w.Heartbeat()
+			case REQUEST:
+				fmt.Println("REQUEST Received")
+				replyBody := rh(m[5:])
+				w.Reply(replyBody, m[3])
+			}
+		case <-time.After(3 * time.Second):
 			w.Heartbeat()
-		case REQUEST:
-			fmt.Println("REQUEST")
-			replyBody := rh(m[5:])
-			w.Reply(replyBody, m[3])
+			if missed++; missed >= 3 {
+				w.Reconnect()
+				missed = 0
+			}
 		}
 	}
 }
@@ -88,9 +104,17 @@ func (w *worker) Listen(rh RequestHandler) {
 func (w *worker) Heartbeat() {
 	m := CreateWorkerMessage(HEARTBEAT)
 	w.conn.Send(m, 0.0)
+	fmt.Println("HEARTBEAT Sent")
 }
 
 func (w *worker) Disconnect() {
 	m := CreateWorkerMessage(DISCONNECT)
 	w.conn.Send(m, 0.0)
+}
+
+func (w *worker) Reconnect() {
+	fmt.Println("disconnect and reconnect...")
+	w.Disconnect()
+	if err := w.Dial(); err != nil { panic(err) }
+	w.Ready()
 }
