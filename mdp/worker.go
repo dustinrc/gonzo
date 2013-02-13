@@ -40,6 +40,35 @@ func (w *worker) Dial() error {
 	return nil
 }
 
+func (w *worker) Listen(rh RequestHandler) {
+	rq := make(chan gonzo.Message, 1)
+	missed := 0
+	go w.listen(rq)
+	w.ready()
+	for {
+		select {
+		case m := <-rq:
+			switch m[2][0] {
+			default:
+				w.reconnect()
+			case HEARTBEAT:
+				fmt.Println("HEARTBEAT Received")
+				w.heartbeat()
+			case REQUEST:
+				fmt.Println("REQUEST Received")
+				replyBody := rh(m[5:])
+				w.reply(replyBody, m[3])
+			}
+		case <-time.After(3 * time.Second):
+			w.heartbeat()
+			if missed++; missed >= 3 {
+				w.reconnect()
+				missed = 0
+			}
+		}
+	}
+}
+
 func (w *worker) Close() {
 	w.disconnect()
 	w.conn.Close()
@@ -67,35 +96,6 @@ func (w *worker) listen(requests chan gonzo.Message) {
 	for {
 		m, _ := w.conn.Recv(-1)
 		requests <- m
-	}
-}
-
-func (w *worker) Listen(rh RequestHandler) {
-	rq := make(chan gonzo.Message, 1)
-	missed := 0
-	go w.listen(rq)
-	w.ready()
-	for {
-		select {
-		case m := <-rq:
-			switch m[2][0] {
-			default:
-				w.reconnect()
-			case HEARTBEAT:
-				fmt.Println("HEARTBEAT Received")
-				w.heartbeat()
-			case REQUEST:
-				fmt.Println("REQUEST Received")
-				replyBody := rh(m[5:])
-				w.reply(replyBody, m[3])
-			}
-		case <-time.After(3 * time.Second):
-			w.heartbeat()
-			if missed++; missed >= 3 {
-				w.reconnect()
-				missed = 0
-			}
-		}
 	}
 }
 
