@@ -33,8 +33,5 @@ func main() {
 	}
 	defer w.Close()
 
-	w.Ready()
-	defer w.Disconnect()
-
 	w.Listen(echo)
 }
