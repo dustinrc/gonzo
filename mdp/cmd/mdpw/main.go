@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	broker = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
+	broker  = flag.String("b", "tcp://127.0.0.1:5555", "broker connection point")
 	service = flag.String("s", "echo", "service provided")
 )
 

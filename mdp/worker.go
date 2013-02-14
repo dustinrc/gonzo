@@ -16,8 +16,8 @@ type Worker interface {
 }
 
 type worker struct {
-	conn *gonzo.Connection
-	url string
+	conn    *gonzo.Connection
+	url     string
 	service string
 }
 
@@ -113,6 +113,8 @@ func (w *worker) disconnect() {
 func (w *worker) reconnect() {
 	fmt.Println("disconnect and reconnect...")
 	w.disconnect()
-	if err := w.Dial(); err != nil { panic(err) }
+	if err := w.Dial(); err != nil {
+		panic(err)
+	}
 	w.ready()
 }
